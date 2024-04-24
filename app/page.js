@@ -1,9 +1,40 @@
-import Image from "next/image";
+'use client'
+import React from 'react';
+import Image from 'next/image'
+import { getTokenCount, updateTokenCount } from '../lib/Users';
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  // Fonction pour gérer l'utilisation des tokens par un utilisateur
+  const [tokensUsed, setTokensUsed] = useState(0); // État pour suivre le nombre de tokens utilisés
+
+  // Fonction pour gérer l'utilisation d'un token par l'utilisateur
+  const handleTokenUsage = async () => {
+    const userId = 1; // Remplacez 1 par l'ID de l'utilisateur réel
+
+    if (tokensUsed < 50) {
+      // Vérifiez d'abord si l'utilisateur a encore des tokens disponibles
+      const tokenCount = await getTokenCount(userId);
+
+      if (tokenCount > 0) {
+        // Exécutez votre logique pour l'utilisation d'un token ici
+        console.log('Utilisation d\'un token');
+        
+        // Mettez à jour le nombre de tokens de l'utilisateur après utilisation
+        await updateTokenCount(userId);
+
+        // Mettez à jour l'état pour suivre le nombre de tokens utilisés
+        setTokensUsed(tokensUsed + 1);
+      } else {
+        console.log('Pas de token disponible');
+      }
+    } else {
+      console.log('Vous avez déjà utilisé tous vos tokens disponibles');
+    }
+  }
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
+       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
           Get started by editing&nbsp;
           <code className="font-mono font-bold">app/page.js</code>
@@ -108,6 +139,12 @@ export default function Home() {
           </p>
         </a>
       </div>
+    
+      <div>
+        <p>Nombre de tokens utilisés : {tokensUsed}</p>
+        <button onClick={handleTokenUsage}>Utiliser un token</button>
+      </div>
     </main>
   );
 }
+  
